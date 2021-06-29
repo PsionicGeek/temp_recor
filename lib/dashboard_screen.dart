@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:temp_recor/main.dart';
-import 'package:temp_recor/screen/detect_screen.dart';
+
+import 'captureFace.dart';
 class DashboardScreen extends StatefulWidget {
 
   @override
@@ -44,10 +45,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       backgroundColor: Colors.white,
         floatingActionButton: new FloatingActionButton(
-          onPressed: (){},
-          tooltip: 'Increment',
-          child: new Icon(Icons.add),
-        ),body: DetectScreen(title: "Real Face",),
+          onPressed: (){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CaptureFace(),
+              ),
+            );
+          },
+          tooltip: 'Add',
+          child: new Icon(Icons.person_add_sharp),
+        ),
+      body: Scaffold(
+        //TODO Add cards
+      ),
     );
   }
 }

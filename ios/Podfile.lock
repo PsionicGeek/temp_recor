@@ -317,10 +317,6 @@ PODS:
   - nanopb/decode (2.30908.0)
   - nanopb/encode (2.30908.0)
   - PromisesObjC (1.2.12)
-  - TensorFlowLiteC (2.2.0)
-  - tflite (1.1.2):
-    - Flutter
-    - TensorFlowLiteC
 
 DEPENDENCIES:
   - camera (from `.symlinks/plugins/camera/ios`)
@@ -328,7 +324,6 @@ DEPENDENCIES:
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - Flutter (from `Flutter`)
-  - tflite (from `.symlinks/plugins/tflite/ios`)
 
 SPEC REPOS:
   trunk:
@@ -347,7 +342,6 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - PromisesObjC
-    - TensorFlowLiteC
 
 EXTERNAL SOURCES:
   camera:
@@ -360,8 +354,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_core/ios"
   Flutter:
     :path: Flutter
-  tflite:
-    :path: ".symlinks/plugins/tflite/ios"
 
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
@@ -384,8 +376,6 @@ SPEC CHECKSUMS:
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
-  TensorFlowLiteC: b3ab9e867b0b71052ca102a32a786555b330b02e
-  tflite: 7acd11db0915e2d90ab90474413068568eb605f0
 
 PODFILE CHECKSUM: 7adbc9d59f05e1b01f554ea99b6c79e97f2214a2
 

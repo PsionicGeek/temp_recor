@@ -15,9 +15,9 @@ Future<String> _login(LoginData login) {
     }
     catch(e){
       print(e);
-      return e.message;
+      return '$e';
     }
-    return null;
+    return '' ;
   });
 }
 
@@ -29,7 +29,7 @@ Future<String> _login(LoginData login) {
             email: signup.name,
             password: signup.password)
             .then((signedUser) {
-          userCollection.doc(signedUser.user.uid).set({
+          userCollection.doc(signedUser.user!.uid).set({
             'email': signup.name,
             'password': signup.password,
 
@@ -38,9 +38,9 @@ Future<String> _login(LoginData login) {
       }
       catch(e){
         print(e);
-        return e.message;
+        return '$e';
       }
-      return null;
+      return '';
     });
   }
   Future<String> _recoverPassword(String name) {
@@ -50,7 +50,7 @@ Future<String> _login(LoginData login) {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: name );
     }
     catch(e) {
-      return e.message;
+      return '$e';
     }
 
     return "Password Link has been sent!!";

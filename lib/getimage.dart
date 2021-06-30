@@ -5,8 +5,10 @@ import 'package:image/image.dart' as im;
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:network_to_file_image/network_to_file_image.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
+import 'package:path/path.dart' as p;
 
 class GetFaceImage extends StatefulWidget {
   const GetFaceImage({Key? key}) : super(key: key);
@@ -148,7 +150,7 @@ class _FaceCoordinatesState extends State<FaceCoordinates> {
 
   late String imagePath;
 
-  void inFirst() async{
+  Future<void> inFirst() async{
     var uuid = Uuid();
      dImage = im.decodeJpg(widget.uImage);
     displayFace = im.copyCrop(
@@ -159,20 +161,33 @@ class _FaceCoordinatesState extends State<FaceCoordinates> {
      jpgInt = im.encodeJpg(displayFace);
     croppedImage = Image.memory(jpgInt as Uint8List);
 
-    directory = (await getExternalStorageDirectory())!;
-    path = directory.path;
-    await Directory('$path/images').create(recursive: true);
-     imagePath = '$path/images/${uuid.v4()}.jpg';
-    File(imagePath).writeAsBytesSync(jpgInt
+
+     imagePath = file("{uuid.v4()}.png") as String;
+     File(imagePath).writeAsBytesSync(jpgInt
     );
   }
+  Future<File> file(String filename) async {
+    Directory dir = await getApplicationDocumentsDirectory();
+    String pathName = p.join(dir.path, filename);
+    return File(pathName);
+  }
 
+  void callFu()async{
+    await inFirst();
+  }
+@override
+void initState() {
+  callFu();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
-    inFirst();
+
     return Container(
       child: Image(
-          image: Image.file(File(imagePath)) ),
+          image: NetworkToFileImage(
+        url: "https://example.com/someFile.png",
+        file: File(imagePath) ),)
 
     );
   }

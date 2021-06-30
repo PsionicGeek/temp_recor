@@ -5,7 +5,8 @@ import 'package:image/image.dart' as im;
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:temp_recor/cropfaces.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class GetFaceImage extends StatefulWidget {
   const GetFaceImage({Key? key}) : super(key: key);
@@ -20,12 +21,12 @@ class _GetFaceImageState extends State<GetFaceImage> {
   ImagePicker picker = ImagePicker();
   late Uint8List _uImage;
 
-  void _getImageAndDetectFace() async {
+  Future<void> _getImageAndDetectFace() async {
     final pickedFile = await picker.getImage(
       source: ImageSource.camera,
     );
     final imageFile = File(pickedFile!.path);
-    final image = FirebaseVisionImage.fromFile(imageFile);
+    final image = await FirebaseVisionImage.fromFile(imageFile);
     final FaceDetector faceDetector = FirebaseVision.instance.faceDetector(
       FaceDetectorOptions(
         mode: FaceDetectorMode.accurate,
@@ -40,13 +41,14 @@ class _GetFaceImageState extends State<GetFaceImage> {
         _uImage=uImage;
       });
     }
+  faceDetector.close();
   }
-
-  @override
-  void initState() {
+  late Widget widgetHolder;
+@override
+void initState() {
+    widgetHolder=Text("True", style: TextStyle(fontSize: 40),);
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
     bool isFace = false;
@@ -64,10 +66,14 @@ class _GetFaceImageState extends State<GetFaceImage> {
                     height:MediaQuery.of(context).size.height/1.5 ,
                     child: Center(
                       child: TextButton.icon(
-                        onPressed: () {
-                          setState(() {
+                        onPressed: ()async {
+                          print("Success1");
+                          await _getImageAndDetectFace();
+                          setState(()  {
                             isFace = true;
-                            _getImageAndDetectFace();
+                            print("Success2");
+                            widgetHolder=ImageAndFaces(imageFile: _imageFile, faces: _faces,uImage: _uImage,);
+                            print(isFace);
                           });
                         },
                         icon: Icon(Icons.camera),
@@ -79,12 +85,14 @@ class _GetFaceImageState extends State<GetFaceImage> {
           ),
 
           Container(
+
             width:MediaQuery.of(context).size.width ,
             height:MediaQuery.of(context).size.height/3,
-            child:isFace?ImageAndFaces(imageFile: _imageFile, faces: _faces,uImage: _uImage,):null,
+            child:widgetHolder,
           )
         ],
       ),
+
       // body: ImageAndFaces(
       //   imageFile: _imageFile,
       //   faces: _faces,
@@ -103,16 +111,7 @@ class ImageAndFaces extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        // Flexible(
-        //   flex: 2,
-        //   child: Container(
-        //     constraints: BoxConstraints.expand(),
-        //     child: Image.file(
-        //       imageFile,
-        //       fit: BoxFit.cover,
-        //     ),
-        //   ),
-        // ),
+
         Flexible(
             flex: 2,
             child: FaceCoordinates(
@@ -124,21 +123,56 @@ class ImageAndFaces extends StatelessWidget {
   }
 }
 
-class FaceCoordinates extends StatelessWidget {
+class FaceCoordinates extends StatefulWidget {
   const FaceCoordinates({Key? key, required this.imageFile, required this.face, required this.uImage}) : super(key: key);
   final Face face;
   final Uint8List uImage;
   final File imageFile;
+
+  @override
+  _FaceCoordinatesState createState() => _FaceCoordinatesState();
+}
+
+class _FaceCoordinatesState extends State<FaceCoordinates> {
+  late im.Image dImage;
+
+  late im.Image displayFace;
+
+  late List<int> jpgInt;
+
+  late Image croppedImage;
+
+  late Directory directory;
+
+  late String path;
+
+  late String imagePath;
+
+  void inFirst() async{
+    var uuid = Uuid();
+     dImage = im.decodeJpg(widget.uImage);
+    displayFace = im.copyCrop(
+      dImage, widget.face.boundingBox.topLeft.dx.toInt(),
+      widget.face.boundingBox.topLeft.dy.toInt(),
+      widget.face.boundingBox.width.toInt(),
+      widget.face.boundingBox.height.toInt(),);
+     jpgInt = im.encodeJpg(displayFace);
+    croppedImage = Image.memory(jpgInt as Uint8List);
+
+    directory = (await getExternalStorageDirectory())!;
+    path = directory.path;
+    await Directory('$path/images').create(recursive: true);
+     imagePath = '$path/images/${uuid.v4()}.jpg';
+    File(imagePath).writeAsBytesSync(jpgInt
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final pos = face.boundingBox;
-    final im.Image dImage = im.decodeJpg(uImage);
+    inFirst();
     return Container(
       child: Image(
-          image: im.copyCrop(dImage,face.boundingBox.topLeft.dx.toInt(),
-          face.boundingBox.topLeft.dy.toInt(),
-          face.boundingBox.width.toInt(),
-          face.boundingBox.height.toInt(),) as ImageProvider ),
+          image: Image.file(File(imagePath)) ),
 
     );
   }

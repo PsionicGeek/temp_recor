@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:temp_recor/getimage.dart';
 import 'package:temp_recor/main.dart';
 
-import 'captureFace.dart';
 class DashboardScreen extends StatefulWidget {
 
   @override
@@ -46,10 +46,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: Colors.white,
         floatingActionButton: new FloatingActionButton(
           onPressed: (){
+
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => CaptureFace(),
+                builder: (context) =>GetFaceImage(),
               ),
             );
           },
